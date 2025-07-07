@@ -15,7 +15,40 @@
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 
-const cup = { x: canvas.width / 2 - 40, y: canvas.height - 60, width: 80, height: 50, speed: 7 };
+const baseUrl =
+    'https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/72x72/';
+
+// Load Booster Juice cup image (cup with straw)
+const cupImg = new Image();
+cupImg.crossOrigin = 'anonymous';
+cupImg.src = baseUrl + '1F964.png';
+
+const cup = {
+    x: canvas.width / 2 - 35,
+    y: canvas.height - 80,
+    width: 70,
+    height: 70,
+    speed: 7,
+    image: cupImg
+};
+
+const fruitCodes = [
+    '1F34C', // banana
+    '1F353', // strawberry
+    '1F347', // raspberry (grapes used as placeholder)
+    '1F96D', // mango
+    '1FAD0', // blueberry
+    '1F34D', // pineapple
+    '1F349'  // watermelon slice
+];
+
+const fruitImages = fruitCodes.map(code => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.src = baseUrl + code + '.png';
+    return img;
+});
+
 let fruits = [];
 let score = 0;
 let lastSpawn = 0;
@@ -24,25 +57,22 @@ function spawnFruit() {
     const radius = 15 + Math.random() * 10;
     const x = Math.random() * (canvas.width - 2 * radius) + radius;
     const speed = 2 + Math.random() * 3;
-    const colors = ['#ff0000', '#ffa500', '#ffff00', '#00ff00', '#800080'];
-    const color = colors[Math.floor(Math.random() * colors.length)];
-    fruits.push({ x, y: -radius, radius, speed, color });
+    const image = fruitImages[Math.floor(Math.random() * fruitImages.length)];
+    fruits.push({ x, y: -radius, radius, speed, image });
 }
 
 function drawCup() {
-    ctx.fillStyle = '#ff00ff';
-    ctx.fillRect(cup.x, cup.y, cup.width, cup.height);
-    ctx.fillStyle = '#ffffff';
-    ctx.fillText('Booster', cup.x + 10, cup.y + 20);
-    ctx.fillText('Juice', cup.x + 20, cup.y + 40);
+    ctx.drawImage(cup.image, cup.x, cup.y, cup.width, cup.height);
 }
 
 function drawFruit(fruit) {
-    ctx.beginPath();
-    ctx.arc(fruit.x, fruit.y, fruit.radius, 0, Math.PI * 2);
-    ctx.fillStyle = fruit.color;
-    ctx.fill();
-    ctx.closePath();
+    ctx.drawImage(
+        fruit.image,
+        fruit.x - fruit.radius,
+        fruit.y - fruit.radius,
+        fruit.radius * 2,
+        fruit.radius * 2
+    );
 }
 
 function drawScore() {
