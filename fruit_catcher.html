@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fruit Catcher</title>
+<style>
+    body { margin: 0; background: #f0f0f0; display: flex; justify-content: center; align-items: center; height: 100vh; }
+    canvas { background: #fff; border: 1px solid #333; }
+</style>
+</head>
+<body>
+<canvas id="game" width="600" height="400"></canvas>
+<script>
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+
+const baseUrl =
+    'https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/72x72/';
+
+// Load Booster Juice cup image (cup with straw)
+const cupImg = new Image();
+cupImg.crossOrigin = 'anonymous';
+cupImg.src = baseUrl + '1F964.png';
+
+const cup = {
+    x: canvas.width / 2 - 35,
+    y: canvas.height - 80,
+    width: 70,
+    height: 70,
+    speed: 7,
+    image: cupImg
+};
+
+const fruitCodes = [
+    '1F34C', // banana
+    '1F353', // strawberry
+    '1F347', // raspberry (grapes used as placeholder)
+    '1F96D', // mango
+    '1FAD0', // blueberry
+    '1F34D', // pineapple
+    '1F349'  // watermelon slice
+];
+
+const fruitImages = fruitCodes.map(code => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.src = baseUrl + code + '.png';
+    return img;
+});
+
+let fruits = [];
+let score = 0;
+let lastSpawn = 0;
+
+function spawnFruit() {
+    const radius = 15 + Math.random() * 10;
+    const x = Math.random() * (canvas.width - 2 * radius) + radius;
+    const speed = 2 + Math.random() * 3;
+    const image = fruitImages[Math.floor(Math.random() * fruitImages.length)];
+    fruits.push({ x, y: -radius, radius, speed, image });
+}
+
+function drawCup() {
+    ctx.drawImage(cup.image, cup.x, cup.y, cup.width, cup.height);
+}
+
+function drawFruit(fruit) {
+    ctx.drawImage(
+        fruit.image,
+        fruit.x - fruit.radius,
+        fruit.y - fruit.radius,
+        fruit.radius * 2,
+        fruit.radius * 2
+    );
+}
+
+function drawScore() {
+    ctx.fillStyle = '#000';
+    ctx.font = '16px Arial';
+    ctx.fillText('Score: ' + score, 10, 20);
+}
+
+function update(timestamp) {
+    if (timestamp - lastSpawn > 1000) {
+        spawnFruit();
+        lastSpawn = timestamp;
+    }
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    fruits.forEach((fruit, index) => {
+        fruit.y += fruit.speed;
+        if (fruit.y - fruit.radius > canvas.height) {
+            fruits.splice(index, 1);
+        } else if (
+            fruit.x > cup.x &&
+            fruit.x < cup.x + cup.width &&
+            fruit.y + fruit.radius > cup.y &&
+            fruit.y - fruit.radius < cup.y + cup.height
+        ) {
+            fruits.splice(index, 1);
+            score += 1;
+        } else {
+            drawFruit(fruit);
+        }
+    });
+
+    drawCup();
+    drawScore();
+    requestAnimationFrame(update);
+}
+
+let keys = {};
+window.addEventListener('keydown', e => keys[e.key] = true);
+window.addEventListener('keyup', e => keys[e.key] = false);
+
+function moveCup() {
+    if (keys['ArrowLeft']) cup.x -= cup.speed;
+    if (keys['ArrowRight']) cup.x += cup.speed;
+    cup.x = Math.max(0, Math.min(canvas.width - cup.width, cup.x));
+    requestAnimationFrame(moveCup);
+}
+
+requestAnimationFrame(update);
+requestAnimationFrame(moveCup);
+</script>
+</body>
+</html>
