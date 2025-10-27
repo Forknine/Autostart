@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cartoon Card Match</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="game-wrapper">
+      <header class="game-header">
+        <h1>Cartoon Card Match</h1>
+        <p class="game-subtitle">
+          Flip two cards at a time to find every pair of mischievous cartoon pals!
+        </p>
+        <div class="scoreboard" role="status" aria-live="polite">
+          <div><span class="label">Moves:</span> <span id="move-count">0</span></div>
+          <div><span class="label">Matches:</span> <span id="match-count">0</span>/32</div>
+          <div><span class="label">Time:</span> <span id="time-elapsed">0</span>s</div>
+        </div>
+        <div class="controls">
+          <button id="restart" type="button">Restart Game</button>
+        </div>
+      </header>
+      <section class="board" id="board" aria-label="Memory board"></section>
+      <p class="game-message" id="game-message" role="status" aria-live="polite"></p>
+    </main>
+    <script src="script.js"></script>
+  </body>
+</html>
